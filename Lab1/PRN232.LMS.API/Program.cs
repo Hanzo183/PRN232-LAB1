@@ -27,6 +27,7 @@ builder.Services
     {
         // Content negotiation: return 406 when the Accept header can't be satisfied.
         options.ReturnHttpNotAcceptable = true;
+        options.Filters.Add(new ProducesAttribute("application/json", "application/xml"));
     })
     .AddJsonOptions(options =>
     {
@@ -158,8 +159,9 @@ builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
 
 var app = builder.Build();
 
-app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<RequestLoggingMiddleware>();
+
 
 // Configure the HTTP request pipeline.
 app.UseSwagger(options =>
