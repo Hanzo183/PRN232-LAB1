@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option csharp_namespace = "PRN232.LMS.Grpc";
+
+package student;
+
+service StudentLookup {
+  rpc GetStudent (StudentRequest) returns (StudentReply);
+}
+
+message StudentRequest {
+  int32 student_id = 1;
+}
+
+message StudentReply {
+  bool exists = 1;
+  int32 student_id = 2;
+  string full_name = 3;
+  string email = 4;
+}

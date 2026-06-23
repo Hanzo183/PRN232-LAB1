@@ -26,6 +26,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ISubjectService, SubjectService>();
         services.AddScoped<IEnrollmentService, EnrollmentService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IStudentLookupClient, RepositoryStudentLookupClient>();
 
         return services;
     }

@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Asp.Versioning.Mvc" Version="10.0.0" />
+    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="10.0.0" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
+    <PackageReference Include="Google.Protobuf" Version="3.25.1" />
+    <PackageReference Include="Grpc.Net.ClientFactory" Version="2.60.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.60.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.8" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PRN232.LMS.Services\PRN232.LMS.Services.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="..\Protos\student.proto" GrpcServices="Client" Link="Protos\student.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\PRN232.LMS.API\Controllers\CoursesController.cs" Link="Controllers\CoursesController.cs" />
+    <Compile Include="..\PRN232.LMS.API\Controllers\EnrollmentsController.cs" Link="Controllers\EnrollmentsController.cs" />
+    <Compile Include="..\PRN232.LMS.API\Infrastructure\ConfigureSwaggerOptions.cs" Link="Infrastructure\ConfigureSwaggerOptions.cs" />
+    <Compile Include="..\PRN232.LMS.API\Infrastructure\FieldSelection.cs" Link="Infrastructure\FieldSelection.cs" />
+    <Compile Include="..\PRN232.LMS.API\Infrastructure\Mapping.cs" Link="Infrastructure\Mapping.cs" />
+    <Compile Include="..\PRN232.LMS.API\Infrastructure\QueryParsing.cs" Link="Infrastructure\QueryParsing.cs" />
+    <Compile Include="..\PRN232.LMS.API\Middleware\*.cs" LinkBase="Middleware" />
+    <Compile Include="..\PRN232.LMS.API\Models\*.cs" LinkBase="Models" />
+    <Compile Include="..\PRN232.LMS.API\Models\Requests\*.cs" LinkBase="Models\Requests" />
+    <Compile Include="..\PRN232.LMS.API\Models\Responses\*.cs" LinkBase="Models\Responses" />
+    <Compile Include="..\PRN232.LMS.API\Validation\AllowedValuesAttribute.cs" Link="Validation\AllowedValuesAttribute.cs" />
+  </ItemGroup>
+
+</Project>

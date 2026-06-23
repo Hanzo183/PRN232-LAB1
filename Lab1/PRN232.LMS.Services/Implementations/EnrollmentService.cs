@@ -11,10 +11,10 @@ namespace PRN232.LMS.Services.Implementations;
 public sealed class EnrollmentService : IEnrollmentService
 {
     private readonly IEnrollmentRepository _enrollments;
-    private readonly IStudentRepository _students;
+    private readonly IStudentLookupClient _students;
     private readonly ICourseRepository _courses;
 
-    public EnrollmentService(IEnrollmentRepository enrollments, IStudentRepository students, ICourseRepository courses)
+    public EnrollmentService(IEnrollmentRepository enrollments, IStudentLookupClient students, ICourseRepository courses)
     {
         _enrollments = enrollments;
         _students = students;
@@ -86,8 +86,8 @@ public sealed class EnrollmentService : IEnrollmentService
             return ServiceResult<EnrollmentModel>.Fail("Validation", "Status is required.");
         }
 
-        var studentExists = await _students.GetByIdAsync(model.StudentId) is not null;
-        if (!studentExists)
+        var student = await _students.GetStudentAsync(model.StudentId);
+        if (student is null)
         {
             return ServiceResult<EnrollmentModel>.Fail("Validation", "StudentId does not exist.");
         }
@@ -108,7 +108,8 @@ public sealed class EnrollmentService : IEnrollmentService
 
         await _enrollments.CreateAsync(entity);
         var created = await _enrollments.GetByIdWithStudentAndCourseAsync(entity.EnrollmentId);
-        return ServiceResult<EnrollmentModel>.Ok(ToModel(created!, includeStudent: true, includeCourse: true));
+        var modelResult = ToModel(created!, includeStudent: false, includeCourse: true) with { Student = student };
+        return ServiceResult<EnrollmentModel>.Ok(modelResult);
     }
 
     public async Task<ServiceResult<EnrollmentModel>> UpdateAsync(int id, EnrollmentUpsertModel model)
@@ -119,8 +120,8 @@ public sealed class EnrollmentService : IEnrollmentService
             return ServiceResult<EnrollmentModel>.Fail("NotFound", $"Enrollment {id} not found.");
         }
 
-        var studentExists = await _students.GetByIdAsync(model.StudentId) is not null;
-        if (!studentExists)
+        var student = await _students.GetStudentAsync(model.StudentId);
+        if (student is null)
         {
             return ServiceResult<EnrollmentModel>.Fail("Validation", "StudentId does not exist.");
         }
@@ -139,7 +140,8 @@ public sealed class EnrollmentService : IEnrollmentService
         await _enrollments.SaveChangesAsync();
 
         var updated = await _enrollments.GetByIdWithStudentAndCourseAsync(id);
-        return ServiceResult<EnrollmentModel>.Ok(ToModel(updated!, includeStudent: true, includeCourse: true));
+        var modelResult = ToModel(updated!, includeStudent: false, includeCourse: true) with { Student = student };
+        return ServiceResult<EnrollmentModel>.Ok(modelResult);
     }
 
     public async Task<ServiceResult<bool>> DeleteAsync(int id)

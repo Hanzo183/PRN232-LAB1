@@ -1,5 +1,9 @@
 <Solution>
+  <Project Path="PRN232.LMS.ApiGateway/PRN232.LMS.ApiGateway.csproj" />
   <Project Path="PRN232.LMS.API/PRN232.LMS.API.csproj" />
+  <Project Path="PRN232.LMS.CourseService/PRN232.LMS.CourseService.csproj" />
+  <Project Path="PRN232.LMS.IdentityService/PRN232.LMS.IdentityService.csproj" />
   <Project Path="PRN232.LMS.Repositories/PRN232.LMS.Repositories.csproj" />
   <Project Path="PRN232.LMS.Services/PRN232.LMS.Services.csproj" />
+  <Project Path="PRN232.LMS.StudentService/PRN232.LMS.StudentService.csproj" />
 </Solution>

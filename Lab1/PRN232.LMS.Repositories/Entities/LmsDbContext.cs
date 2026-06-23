@@ -15,6 +15,11 @@ public partial class LmsDbContext : DbContext
     {
     }
 
+    protected LmsDbContext(DbContextOptions options)
+        : base(options)
+    {
+    }
+
     public virtual DbSet<Course> Courses { get; set; }
 
     public virtual DbSet<Enrollment> Enrollments { get; set; }

@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Asp.Versioning.Mvc" Version="10.0.0" />
+    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="10.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.8" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PRN232.LMS.Services\PRN232.LMS.Services.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\PRN232.LMS.API\Controllers\AuthController.cs" Link="Controllers\AuthController.cs" />
+    <Compile Include="..\PRN232.LMS.API\Infrastructure\AuthSeeder.cs" Link="Infrastructure\AuthSeeder.cs" />
+    <Compile Include="..\PRN232.LMS.API\Infrastructure\ConfigureSwaggerOptions.cs" Link="Infrastructure\ConfigureSwaggerOptions.cs" />
+    <Compile Include="..\PRN232.LMS.API\Middleware\*.cs" LinkBase="Middleware" />
+    <Compile Include="..\PRN232.LMS.API\Models\*.cs" LinkBase="Models" />
+    <Compile Include="..\PRN232.LMS.API\Models\Requests\AuthRequests.cs" Link="Models\Requests\AuthRequests.cs" />
+    <Compile Include="..\PRN232.LMS.API\Models\Responses\AuthResponses.cs" Link="Models\Responses\AuthResponses.cs" />
+    <Compile Include="..\PRN232.LMS.API\Security\*.cs" LinkBase="Security" />
+  </ItemGroup>
+
+</Project>

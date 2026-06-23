@@ -1,28 +1,114 @@
 services:
-  db:
+  identity-db:
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD in your environment or a .env file}"
     ports:
-      - "14330:1433"
+      - "14331:1433"
     healthcheck:
       test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q \"SELECT 1\""]
       interval: 10s
       timeout: 5s
       retries: 10
 
-  api:
+  student-db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD in your environment or a .env file}"
+    ports:
+      - "14332:1433"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q \"SELECT 1\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  course-db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD in your environment or a .env file}"
+    ports:
+      - "14333:1433"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q \"SELECT 1\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  identity-service:
     build:
       context: .
-      dockerfile: PRN232.LMS.API/Dockerfile
+      dockerfile: PRN232.LMS.IdentityService/Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: "Development"
-      ConnectionStrings__LmsDb: "Server=db,1433;Database=LMS_DB;User Id=sa;Password=${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD in your environment or a .env file};TrustServerCertificate=True;Encrypt=False"
+      ConnectionStrings__IdentityDb: "Server=identity-db,1433;Database=LMS_IDENTITY_DB;User Id=sa;Password=${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD in your environment or a .env file};TrustServerCertificate=True;Encrypt=False"
       Jwt__Key: "${JWT_SECRET:?Set JWT_SECRET in your environment or a .env file}"
+      Jwt__Issuer: "PRN232.LMS"
+      Jwt__Audience: "PRN232.LMS"
       Admin__Password: "${ADMIN_PASSWORD:-123456}"
+    ports:
+      - "8081:8080"
+    depends_on:
+      identity-db:
+        condition: service_healthy
+
+  student-service:
+    build:
+      context: .
+      dockerfile: PRN232.LMS.StudentService/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ConnectionStrings__StudentDb: "Server=student-db,1433;Database=LMS_STUDENT_DB;User Id=sa;Password=${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD in your environment or a .env file};TrustServerCertificate=True;Encrypt=False"
+      Jwt__Key: "${JWT_SECRET:?Set JWT_SECRET in your environment or a .env file}"
+      Jwt__Issuer: "PRN232.LMS"
+      Jwt__Audience: "PRN232.LMS"
+    ports:
+      - "8082:8080"
+      - "9082:8081"
+    depends_on:
+      student-db:
+        condition: service_healthy
+
+  course-service:
+    build:
+      context: .
+      dockerfile: PRN232.LMS.CourseService/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ConnectionStrings__CourseDb: "Server=course-db,1433;Database=LMS_COURSE_DB;User Id=sa;Password=${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD in your environment or a .env file};TrustServerCertificate=True;Encrypt=False"
+      StudentGrpc__Address: "http://student-service:8081"
+      Jwt__Key: "${JWT_SECRET:?Set JWT_SECRET in your environment or a .env file}"
+      Jwt__Issuer: "PRN232.LMS"
+      Jwt__Audience: "PRN232.LMS"
+    ports:
+      - "8083:8080"
+    depends_on:
+      course-db:
+        condition: service_healthy
+      student-service:
+        condition: service_started
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: PRN232.LMS.ApiGateway/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      Jwt__Key: "${JWT_SECRET:?Set JWT_SECRET in your environment or a .env file}"
+      Jwt__Issuer: "PRN232.LMS"
+      Jwt__Audience: "PRN232.LMS"
+      ReverseProxy__Clusters__identity-service__Destinations__identity__Address: "http://identity-service:8080/"
+      ReverseProxy__Clusters__student-service__Destinations__student__Address: "http://student-service:8080/"
+      ReverseProxy__Clusters__course-service__Destinations__course__Address: "http://course-service:8080/"
     ports:
       - "8080:8080"
     depends_on:
-      db:
-        condition: service_healthy
+      identity-service:
+        condition: service_started
+      student-service:
+        condition: service_started
+      course-service:
+        condition: service_started
